@@ -7,7 +7,7 @@ a merge request happens, gitlab sends a json file to this plugin. The plugin
 then initiates a CDash build, and updates the merge request comment with a
 link to the CDash results.
 
-# Installation
+# CDash Installation
 
 Clone the CDashGitlabHook repository into CDash/plugins/gitlab
     cd CDash/plugins
@@ -50,3 +50,25 @@ example config file.
         }
       }
     }
+
+# Register CDash webhook with Gitlab Installation
+
+You must register the webhook for gitlab cdash integration with your Gitllab
+instances.  The following steps are used to do that:
+
+* Navigate to the project settings ( Project page, click "Edit" )
+  Select "Web Hooks" on the left menu.
+
+* Add the following URL to the "URL" field http://cdashserver/plugins/gitlab/gitlabHook.php
+
+* Check "Merge Request events".
+
+* Click "Add Web Hook"
+
+* You can now test the connect to the webhook service. By clicking on "Test Hook".  This test will not trigger a CDash@home build but will send a test json file to the webhook.
+
+* Test a merge request:
+
+**Goto the Commits tab on the Project page on gitlab, then click on Branches and create a new branch
+**Edit a file on that branch
+**Goto Merge Requests tab -> click New Merge Request
