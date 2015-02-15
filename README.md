@@ -1,16 +1,29 @@
-To install:
+# Introduction
 
-put this in CDash/plugins/gitlab
-clone:
-https://github.com/kriswallsmith/Buzz
+This is a plugin for CDash (www.cdash.org) that allows the build management
+feature of CDash http://www.vtk.org/Wiki/CDash:Build_Management to be used
+to automatically test gitlab https://about.gitlab.com/ merge requests. When
+a merge request happens, gitlab sends a json file to this plugin. The plugin
+then initiates a CDash build, and updates the merge request comment with a
+link to the CDash results.
 
-https://github.com/m4tthumphrey/php-gitlab-api.git
+# Installation
 
-into this directory.
+Clone the CDashGitlabHook repository into CDash/plugins/gitlab
+    cd CDash/plugins
+    git clone https://github.com/Kitware/cdashgitlabhook.git gitlab
 
-checkout this tag 6.9.1
+Clone Buzz into CDash/plugins/gitlab.
+    cd CDash/plugins/gitlab
+    git clone https://github.com/kriswallsmith/Buzz
 
-Create a gitlab.config file like this:
+Clone php-gitlab-api into CDash/plugins/gitlab
+    cd CDash/plugins/gitlab
+    git clone https://github.com/m4tthumphrey/php-gitlab-api.git
+    git checkout 6.9.1
+
+Create a gitlab.config file in CDash/plugins/gitlab/gitlab.config. Here is an
+example config file.
 
     {
     "gitlab": {
