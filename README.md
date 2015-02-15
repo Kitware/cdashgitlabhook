@@ -12,11 +12,12 @@ checkout this tag 6.9.1
 
 Create a gitlab.config file like this:
 
-{
+    {
     "gitlab": {
         "url": "https://kwgitlab.kitwarein.com/api/v3/",
-        "https://kwgitlab.kitwarein.com/hoffman/testcdash.git": "jwmXMrgVDyUsX5jgsPS8"
-    },
+        "https://kwgitlab.kitwarein.com/hoffman/testcdash.git":
+        "keyfromgitlab"
+        },
     "cdash": {
         "user_email": "bill.hoffman@kitware.com"
     },
@@ -34,5 +35,5 @@ Create a gitlab.config file like this:
                 "Linux"
             ]
         }
+      }
     }
-}
