@@ -7,7 +7,11 @@ a merge request happens, gitlab sends a json file to this plugin. The plugin
 then initiates a CDash build, and updates the merge request comment with a
 link to the CDash results.
 
-# CDash Installation
+# CDashGitlabHook Installation
+
+First you must install the plugin into your CDash installation. The
+installation process involves cloning several git repostories into
+the plubins directory of CDash and creating a gitlab.config json file.
 
 Clone the CDashGitlabHook repository into CDash/plugins/gitlab
     cd CDash/plugins
@@ -54,7 +58,7 @@ example config file.
 # Register CDash webhook with Gitlab Installation
 
 You must register the webhook for gitlab cdash integration with your Gitllab
-instances.  The following steps are used to do that:
+instance.  The following steps are used to do that:
 
 * Navigate to the project settings ( Project page, click "Edit" )
   Select "Web Hooks" on the left menu.

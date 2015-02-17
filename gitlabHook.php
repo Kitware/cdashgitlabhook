@@ -40,9 +40,6 @@ class GitlabHook
   private $cdashURL;     // url for cdash
   public function __construct($configfile)
   {
-    // clear out the debug file first
-    $debugFile = fopen("c:/Users/hoffman/gitlab.txt", 'w') or die("can't open file");
-    fclose($debugFile);
     // read the config file
     $json = file_get_contents($configfile);
     $data = json_decode($json, TRUE);
@@ -62,18 +59,10 @@ class GitlabHook
     $this->cdashURL = get_server_URI(false);
     $this->cdashURL = str_replace("$cdashCurrentDir", "", $this->cdashURL);
   }
-  public function Debug($msg)
-  {
-    file_put_contents("c:/Users/hoffman/gitlab.txt", print_r($msg, true),
-                      FILE_APPEND  );
-  }
   // This is the main entry point, this expects a json file to be sent to the script
   public function HandleRequest()
   {
     $request = json_decode(file_get_contents('php://input'), true);
-    $this->Debug("request from gitlab:\n");
-    $this->Debug($request);
-    $this->Debug("---------------------------\n");
     if($request['object_kind'] !== 'merge_request')
       {
       add_log("Gitlab Request not a merge_request was: " . $request['object_kind'],
