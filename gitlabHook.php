@@ -18,6 +18,7 @@ require_once("cdash/log.php");
 // define an autoload function to load Buzz and Gitlab files
 // as they are requested with use directive
 spl_autoload_register(function ($class) {
+  $class = str_replace("\\", "/", $class);
   if(strpos($class, "Buzz") !== false)
     {
     include './Buzz/lib/' . $class . '.php';
@@ -170,6 +171,7 @@ class GitlabHook
   {
     $build_tag = sprintf("%s-%s", $timestamp, $branch);
     $cdash_project_name = $cdash_info['cdash_project'];
+    add_log("CDashSubmitBuild  $cdash_project_name\n", LOG_INFO);
     $row = pdo_single_row_query("SELECT webapikey FROM project WHERE name='$cdash_project_name'");
     $key = $row['webapikey'];
     $email = $this->cdashConfig['user_email'];
