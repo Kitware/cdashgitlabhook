@@ -43,6 +43,8 @@ class GitlabHook
   {
     // read the config file
     $json = file_get_contents($configfile);
+    $json_string = print_r($json, true);
+    add_log("config settings:$json_string\n", LOG_INFO);
     $data = json_decode($json, TRUE);
     $this->cdashConfig =  $data['cdash'];
     $this->gitlabConfig = $data['gitlab'];
