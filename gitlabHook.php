@@ -63,10 +63,21 @@ class GitlabHook
   public function HandleRequest()
   {
     $request = json_decode(file_get_contents('php://input'), true);
+    $request_string = print_r($request, true);
+    add_log("request json:[$request_string]\n", LOG_INFO);
     if($request['object_kind'] !== 'merge_request')
       {
-      add_log("Gitlab Request not a merge_request was: " . $request['object_kind'],
-              "GitlabHook::HandleRequest", LOG_INFO);
+      add_log("Gitlab Request not a merge_request was: "
+              . $request['object_kind'], LOG_INFO);
+      echo "CDash config settings:<br>";
+      $config = print_r($this->cdashConfig, true);
+      echo $config . "<br>";
+      echo "CDash config settings:<br>";
+      $config = print_r($this->gitlabConfig, true);
+      echo $config . "<br>\n";
+      echo "Project settings:<br>";
+      $config = print_r($this->projectsConfig, true);
+      echo $config . "<br>";
       return;
       }
     $merge_request = $request['object_attributes'];
