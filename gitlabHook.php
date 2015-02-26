@@ -95,6 +95,18 @@ class GitlabHook
     }
     add_log("Erorr parsing json: ${msg}", $function, LOG_ERR);
   }
+  public function PrintConfig()
+  {
+    echo "CDash config settings:<br>";
+    $config = print_r($this->cdashConfig, true);
+    echo $config . "<br>";
+    echo "CDash config settings:<br>";
+    $config = print_r($this->gitlabConfig, true);
+    echo $config . "<br>\n";
+    echo "Project settings:<br>";
+    $config = print_r($this->projectsConfig, true);
+    echo $config . "<br>";
+  }
   // This is the main entry point, this expects a json file to be sent to the script
   public function HandleRequest()
   {
@@ -104,6 +116,7 @@ class GitlabHook
     if($request == NULL)
       {
       $this->LogJsonParseError("GitlabHook::HandleRequest");
+      $this->PrintConfig();
       return;
       }
     $request_string = print_r($request, true);
@@ -112,15 +125,6 @@ class GitlabHook
       {
       add_log("Gitlab Request not a merge_request was: "
               . $request['object_kind'], LOG_INFO);
-      echo "CDash config settings:<br>";
-      $config = print_r($this->cdashConfig, true);
-      echo $config . "<br>";
-      echo "CDash config settings:<br>";
-      $config = print_r($this->gitlabConfig, true);
-      echo $config . "<br>\n";
-      echo "Project settings:<br>";
-      $config = print_r($this->projectsConfig, true);
-      echo $config . "<br>";
       return;
       }
     $merge_request = $request['object_attributes'];
