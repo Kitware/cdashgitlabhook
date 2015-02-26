@@ -43,14 +43,15 @@ class GitlabHook
   {
     // read the config file
     $json = file_get_contents($configfile);
-    add_log("raw config settings:$json\n", LOG_INFO);
+    add_log("raw config settings:$json\n", "GitlabHook::__construct", LOG_INFO);
     $data = json_decode($json, TRUE);
     if($data == NULL)
       {
       $this->LogJsonParseError("__construct GitlabHook");
       }
     $json_string = print_r($data, true);
-    add_log("parsed config settings:$json_string\n", LOG_INFO);
+    add_log("parsed config settings:$json_string\n",
+            "GitlabHook::__construct", LOG_INFO);
     $this->cdashConfig =  $data['cdash'];
     $this->gitlabConfig = $data['gitlab'];
     $this->projectsConfig = $data['projects'];
@@ -111,7 +112,7 @@ class GitlabHook
   public function HandleRequest()
   {
     $request_string = file_get_contents('php://input');
-    add_log("request json:[$request_string]\n", LOG_INFO);
+    add_log("request json:[$request_string]\n", "GitlabHook::HandleRequest", LOG_INFO);
     $request = json_decode($request_string, true);
     if($request == NULL)
       {
@@ -120,11 +121,12 @@ class GitlabHook
       return;
       }
     $request_string = print_r($request, true);
-    add_log("request json array:[$request_string]\n", LOG_INFO);
+    add_log("request json array:[$request_string]\n",
+            "GitlabHook::HandleRequest", LOG_INFO);
     if($request['object_kind'] !== 'merge_request')
       {
       add_log("Gitlab Request not a merge_request was: "
-              . $request['object_kind'], LOG_INFO);
+              . $request['object_kind'], "GitlabHook::HandleRequest", LOG_INFO);
       return;
       }
     $merge_request = $request['object_attributes'];
@@ -140,16 +142,20 @@ class GitlabHook
       add_log("Gitlab client exception " . $e->getMessage(),
               "GitlabHook::HandleRequest", LOG_ERR);
       add_log("Gitlab url " . $this->gitlabConfig['url'] .
-              " key $key_for_url",
+              " key [$key_for_url]",
               "GitlabHook::HandleRequest", LOG_ERR);
     }
     // get the project id from gitlab using api
     try {
       $project = $this->client->api('projects')->show($merge_request['source_project_id']);
     } catch (Exception $e) {
-      add_log("Gitlab client exception " . $e->getMessage() .
+      add_log("Gitlab client exception " . $e->getMessage(),
               "GitlabHook::HandleRequest", LOG_ERR);
     }
+    $project_string = print_r($project, true);
+    add_log("project array from Gitlab api ". "$project_string",
+                "GitlabHook::HandleRequest",
+                LOG_INFO);
     $target_project_id = $merge_request['target_project_id'];
     $repo_url = $project['http_url_to_repo'];
     $project_name = $project['name'];
@@ -192,7 +198,7 @@ class GitlabHook
       }
     else
       {
-      add_log("$project_name not found in gitlab.config projects",
+      add_log("project_name [$project_name] not found in gitlab.config projects",
               "GitlabHook::HandleRequest",
               LOG_INFO);
       }
@@ -224,7 +230,8 @@ class GitlabHook
   {
     $build_tag = sprintf("%s-%s", $timestamp, $branch);
     $cdash_project_name = $cdash_info['cdash_project'];
-    add_log("CDashSubmitBuild  $cdash_project_name\n", LOG_INFO);
+    add_log("CDashSubmitBuild  $cdash_project_name\n",
+            "GitlabHook::CDashSubmitBuild", LOG_INFO);
     $row = pdo_single_row_query("SELECT webapikey FROM project WHERE name='$cdash_project_name'");
     $key = $row['webapikey'];
     $email = $this->cdashConfig['user_email'];
