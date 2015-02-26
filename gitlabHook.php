@@ -43,9 +43,14 @@ class GitlabHook
   {
     // read the config file
     $json = file_get_contents($configfile);
-    $json_string = print_r($json, true);
-    add_log("config settings:$json_string\n", LOG_INFO);
+    add_log("raw config settings:$json\n", LOG_INFO);
     $data = json_decode($json, TRUE);
+    if($data == NULL)
+      {
+      $this->LogJsonParseError("__construct GitlabHook");
+      }
+    $json_string = print_r($data, true);
+    add_log("parsed config settings:$json_string\n", LOG_INFO);
     $this->cdashConfig =  $data['cdash'];
     $this->gitlabConfig = $data['gitlab'];
     $this->projectsConfig = $data['projects'];
@@ -62,12 +67,47 @@ class GitlabHook
     $this->cdashURL = get_server_URI(false);
     $this->cdashURL = str_replace("$cdashCurrentDir", "", $this->cdashURL);
   }
+  public function LogJsonParseError($function)
+  {
+    $msg = "";
+    switch (json_last_error()) {
+        case JSON_ERROR_NONE:
+          $msg =  ' - No errors';
+        break;
+        case JSON_ERROR_DEPTH:
+          $msg = ' - Maximum stack depth exceeded';
+        break;
+        case JSON_ERROR_STATE_MISMATCH:
+          $msg = ' - Underflow or the modes mismatch';
+        break;
+        case JSON_ERROR_CTRL_CHAR:
+          $msg = ' - Unexpected control character found';
+        break;
+        case JSON_ERROR_SYNTAX:
+          $msg = ' - Syntax error, malformed JSON';
+        break;
+        case JSON_ERROR_UTF8:
+          $msg = ' - Malformed UTF-8 characters, possibly incorrectly encoded';
+        break;
+        default:
+          $msg = ' - Unknown error';
+        break;
+    }
+    add_log("Erorr parsing json: ${msg}", $function, LOG_ERR);
+  }
   // This is the main entry point, this expects a json file to be sent to the script
   public function HandleRequest()
   {
-    $request = json_decode(file_get_contents('php://input'), true);
-    $request_string = print_r($request, true);
+    $request_string = file_get_contents('php://input');
     add_log("request json:[$request_string]\n", LOG_INFO);
+    $request = json_decode($request_string, true);
+    if($request == NULL)
+      {
+      $this->LogJsonParseError("GitlabHook::HandleRequest");
+      return;
+      }
+    $request_string = print_r($request, true);
+    add_log("request json array:[$request_string]\n", LOG_INFO);
     if($request['object_kind'] !== 'merge_request')
       {
       add_log("Gitlab Request not a merge_request was: "
@@ -95,12 +135,15 @@ class GitlabHook
     } catch (Exception $e) {
       add_log("Gitlab client exception " . $e->getMessage(),
               "GitlabHook::HandleRequest", LOG_ERR);
+      add_log("Gitlab url " . $this->gitlabConfig['url'] .
+              " key $key_for_url",
+              "GitlabHook::HandleRequest", LOG_ERR);
     }
     // get the project id from gitlab using api
     try {
       $project = $this->client->api('projects')->show($merge_request['source_project_id']);
     } catch (Exception $e) {
-      add_log("Gitlab client exception " . $e->getMessage(),
+      add_log("Gitlab client exception " . $e->getMessage() .
               "GitlabHook::HandleRequest", LOG_ERR);
     }
     $target_project_id = $merge_request['target_project_id'];
@@ -165,6 +208,10 @@ class GitlabHook
     //execute post
     $result = curl_exec($ch);
     $result = json_decode($result, TRUE);
+    if($result == NULL)
+      {
+      $this->LogJsonParseError("GitlabHook::PostURL");
+      }
     //close connection
     curl_close($ch);
     return $result;
