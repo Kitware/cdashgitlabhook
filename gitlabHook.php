@@ -133,6 +133,14 @@ class GitlabHook
     $source = $merge_request['source'];
     $http_url = $source['http_url'];
     $key_for_url = $this->gitlabConfig[$http_url];
+    if($key_for_url == NULL)
+      {
+      add_log("Gitlab Key not found for $http_url in gitlab.config.",
+              "GitlabHook::HandleRequest", LOG_ERR);
+      $configString = print_r($this->gitlabConfig, true);
+      add_log("gitlab config:[$configString]\n",
+              "GitlabHook::HandleRequest", LOG_ERR);
+      }
     // create the gitlab client object
     try {
       $this->client = new \Gitlab\Client($this->gitlabConfig['url']);
