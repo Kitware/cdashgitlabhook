@@ -73,6 +73,6 @@ instance.  The following steps are used to do that:
 
 * Test a merge request:
 
-  *Goto the Commits tab on the Project page on gitlab, then click on Branches and create a new branch
+  * Goto the Commits tab on the Project page on gitlab, then click on Branches and create a new branch
   * Edit a file on that branch
   * Goto Merge Requests tab -> click New Merge Request
